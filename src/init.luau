@@ -3,23 +3,16 @@
 --!native
 local FAR_AWAY_CFRAME = CFrame.new(9e9, 0, 9e9)
 
-local MovingSpawnedParts = table.create(1000)
-local MovingSpawnedCFrames = table.create(1000)
-
-local MovingRemovedParts = table.create(1000)
-local MovingRemovedCFrames = table.create(1000)
+local MovingParts = table.create(1000)
+local MovingCFrames = table.create(1000)
 
 local ScheduledUpdate = false
 local function UpdateMovement()
 	while true do
-		workspace:BulkMoveTo(MovingSpawnedParts, MovingSpawnedCFrames, Enum.BulkMoveMode.FireCFrameChanged)
-		workspace:BulkMoveTo(MovingRemovedParts, MovingRemovedCFrames, Enum.BulkMoveMode.FireCFrameChanged)
+		workspace:BulkMoveTo(MovingParts, MovingCFrames, Enum.BulkMoveMode.FireCFrameChanged)
 
-		table.clear(MovingSpawnedParts)
-		table.clear(MovingSpawnedCFrames)
-
-		table.clear(MovingRemovedParts)
-		table.clear(MovingRemovedCFrames)
+		table.clear(MovingParts)
+		table.clear(MovingCFrames)
 
 		ScheduledUpdate = false
 		coroutine.yield()
@@ -42,8 +35,8 @@ end
 function Cache:GetPart(PartCFrame: CFrame?): BasePart
 	local Object = table.remove(self._FreeObjects) or self:_GetNew()
 	if PartCFrame then
-		table.insert(MovingSpawnedParts, Object)
-		table.insert(MovingSpawnedCFrames, PartCFrame)
+		table.insert(MovingParts, Object)
+		table.insert(MovingCFrames, PartCFrame)
 
 		if not ScheduledUpdate then
 			ScheduledUpdate = true
@@ -55,8 +48,8 @@ function Cache:GetPart(PartCFrame: CFrame?): BasePart
 end
 function Cache:ReturnPart(Part: BasePart)
 	table.insert(self._FreeObjects, Part)
-	table.insert(MovingRemovedParts, Part)
-	table.insert(MovingRemovedCFrames, FAR_AWAY_CFRAME)
+	table.insert(MovingParts, Part)
+	table.insert(MovingCFrames, FAR_AWAY_CFRAME)
 
 	if not ScheduledUpdate then
 		ScheduledUpdate = true
