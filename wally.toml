@@ -1,0 +1,7 @@
+[package]
+name = "pyseph/objectcache"
+version = "1.0.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+description = "A robust, blazing fast part cache for Roblox."
+license = "MIT"

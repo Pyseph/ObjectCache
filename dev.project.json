@@ -1,0 +1,12 @@
+{
+	"name": "ObjectCache",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"ObjectCache": {
+				"$path": "src"
+			}
+		}
+	}
+}
