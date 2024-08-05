@@ -39,11 +39,11 @@ function Cache:_GetNew()
 	return Object
 end
 
-function Cache:GetPart(TargetCFrame: CFrame?): BasePart
+function Cache:GetPart(PartCFrame: CFrame?): BasePart
 	local Object = table.remove(self._FreeObjects) or self:_GetNew()
-	if TargetCFrame then
+	if PartCFrame then
 		table.insert(MovingSpawnedParts, Object)
-		table.insert(MovingSpawnedCFrames, TargetCFrame)
+		table.insert(MovingSpawnedCFrames, PartCFrame)
 
 		if not ScheduledUpdate then
 			ScheduledUpdate = true
@@ -53,9 +53,9 @@ function Cache:GetPart(TargetCFrame: CFrame?): BasePart
 
 	return Object
 end
-function Cache:ReturnPart(Object: BasePart)
-	table.insert(self._FreeObjects, Object)
-	table.insert(MovingRemovedParts, Object)
+function Cache:ReturnPart(Part: BasePart)
+	table.insert(self._FreeObjects, Part)
+	table.insert(MovingRemovedParts, Part)
 	table.insert(MovingRemovedCFrames, FAR_AWAY_CFRAME)
 
 	if not ScheduledUpdate then
@@ -77,21 +77,21 @@ local function GetCacheContainer(CachesContainer)
 end
 
 local Constructor = {}
-function Constructor.new(Template: BasePart, Amount: number?, CachesContainer: Instance?)
+function Constructor.new(Template: BasePart, CacheSize: number?, CachesContainer: Instance?)
 	local TemplateType = typeof(Template)
 	assert(TemplateType == "Instance", `Invalid argument #1 to 'ObjectCache.new' (BasePart expected, got {TemplateType})`)
 
 	assert(Template:IsA("BasePart"), `Invalid argument #1 to 'ObjectCache.new' (BasePart expected, got {Template.ClassName})`)
 	assert(Template.Archivable, `ObjectCache: Cannot use template part provided, as it has Archivable set to false.`)
 
-	local AmountType = typeof(Amount)
-	assert(Amount == nil or AmountType == "number", `Invalid argument #2 to 'ObjectCache.new' (number expected, got {AmountType})`)
-	assert(Amount == nil or Amount >= 0, `Invalid argument #2 to 'ObjectCache.new' (positive number expected, got {Amount})`)
+	local CacheSizeType = typeof(CacheSize)
+	assert(CacheSize == nil or CacheSizeType == "number", `Invalid argument #2 to 'ObjectCache.new' (number expected, got {CacheSizeType})`)
+	assert(CacheSize == nil or CacheSize >= 0, `Invalid argument #2 to 'ObjectCache.new' (positive number expected, got {CacheSize})`)
 
 	local ContainerType = typeof(CachesContainer)
 	assert(CachesContainer == nil or ContainerType == "Instance", `Invalid argument #3 to 'ObjectCache.new' (Instance expected, got {ContainerType})`)
 
-	local PreallocAmount = Amount or 10
+	local PreallocAmount = CacheSize or 10
 	local CacheParent = GetCacheContainer(CachesContainer or workspace)
 
 	local FreeObjects = table.create(PreallocAmount)
