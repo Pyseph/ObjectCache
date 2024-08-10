@@ -3,8 +3,8 @@
 --!native
 local FAR_AWAY_CFRAME = CFrame.new(9e9, 0, 9e9)
 
-local MovingParts = table.create(1000)
-local MovingCFrames = table.create(1000)
+local MovingParts = table.create(10_000)
+local MovingCFrames = table.create(10_000)
 
 local ScheduledUpdate = false
 local function UpdateMovement()
@@ -35,6 +35,7 @@ end
 function Cache:GetPart(PartCFrame: CFrame?): BasePart
 	local Object = table.remove(self._FreeObjects) or self:_GetNew()
 	if PartCFrame then
+		self._Objects[Object] = nil
 		table.insert(MovingParts, Object)
 		table.insert(MovingCFrames, PartCFrame)
 
@@ -47,6 +48,12 @@ function Cache:GetPart(PartCFrame: CFrame?): BasePart
 	return Object
 end
 function Cache:ReturnPart(Part: BasePart)
+	if self._Objects[Part] then
+		return
+	end
+
+	self._Objects[Part] = true
+
 	table.insert(self._FreeObjects, Part)
 	table.insert(MovingParts, Part)
 	table.insert(MovingCFrames, FAR_AWAY_CFRAME)
@@ -87,16 +94,18 @@ function Constructor.new(Template: BasePart, CacheSize: number?, CachesContainer
 	local PreallocAmount = CacheSize or 10
 	local CacheParent = GetCacheContainer(CachesContainer or workspace)
 
+	local Objects = table.create(PreallocAmount)
 	local FreeObjects = table.create(PreallocAmount)
-	local MovingCFrames = table.create(PreallocAmount)
 
 	Template.Anchored = true
 	for Index = 1, PreallocAmount do
-		FreeObjects[Index] = Template:Clone()
+		local Object = Template:Clone()
+		FreeObjects[Index] = Object
+		MovingParts[Index] = Object
 		MovingCFrames[Index] = FAR_AWAY_CFRAME
 	end
 
-	workspace:BulkMoveTo(FreeObjects, MovingCFrames, Enum.BulkMoveMode.FireCFrameChanged)
+	workspace:BulkMoveTo(MovingParts, MovingCFrames, Enum.BulkMoveMode.FireCFrameChanged)
 	for Index = 1, PreallocAmount do
 		FreeObjects[Index].Parent = CacheParent
 	end
@@ -105,6 +114,7 @@ function Constructor.new(Template: BasePart, CacheSize: number?, CachesContainer
 		CacheHolder = CacheParent,
 		_Template = Template,
 		_FreeObjects = FreeObjects,
+		_Objects = Objects,
 	}, Cache)
 end
 
