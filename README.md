@@ -2,7 +2,6 @@
 <h1 align="center">
 ObjectCache
 <div align="center">A robust, blazing fast part cache for Roblox</div>
-<div align="center">[Get the module](https://create.roblox.com/store/asset/18819618773/ObjectCache)</div>
 
 ## Introduction
 ObjectCache is a modern implementation on handling thousands of active parts, while keeping performance high.
