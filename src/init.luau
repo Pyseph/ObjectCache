@@ -34,8 +34,8 @@ end
 
 function Cache:GetPart(PartCFrame: CFrame?): BasePart
 	local Object = table.remove(self._FreeObjects) or self:_GetNew()
+	self._Objects[Object] = nil
 	if PartCFrame then
-		self._Objects[Object] = nil
 		table.insert(MovingParts, Object)
 		table.insert(MovingCFrames, PartCFrame)
 
