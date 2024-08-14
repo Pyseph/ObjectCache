@@ -31,21 +31,41 @@ function Cache:_GetNew(Amount: number, Warn: boolean)
 
 	local FreeObjectsContainer = self._FreeObjects
 	local InitialLength = #self._FreeObjects
+	local CacheHolder = self.CacheHolder
+
+	local IsTemplateModel = self._IsTemplateModel
+	local Template: Model | BasePart = self._Template
+
+	local TargetParts = table.create(Amount)
+	local TargetCFrames = table.create(Amount)
+	local AddedObjects = table.create(Amount)
 	for Index = InitialLength + 1, InitialLength + Amount do
-		local Object = self._Template:Clone()
-		Object:PivotTo(FAR_AWAY_CFRAME)
+		local Object = Template:Clone()
+		local ObjectRoot: BasePart = if IsTemplateModel then (Object:: Model).PrimaryPart:: BasePart else Object:: BasePart
+
 		FreeObjectsContainer[Index] = Object
-		Object.Parent = self.CacheHolder
+
+		local OffsetIndex = Index - InitialLength
+		TargetParts[OffsetIndex] = ObjectRoot
+		TargetCFrames[OffsetIndex] = FAR_AWAY_CFRAME
+		AddedObjects[OffsetIndex] = Object
+	end
+
+	workspace:BulkMoveTo(TargetParts, TargetCFrames, Enum.BulkMoveMode.FireCFrameChanged)
+
+	for _, Object in AddedObjects do
+		(Object:: Instance).Parent = CacheHolder
 	end
 
 	return FreeObjectsContainer[InitialLength + Amount]
 end
 
 function Cache:GetPart(PartCFrame: CFrame?): BasePart
-	local Object = table.remove(self._FreeObjects) or self:_GetNew(self._ExpandAmount, true)
-	self._Objects[Object] = nil
+	local Part = table.remove(self._FreeObjects) or self:_GetNew(self._ExpandAmount, true)
+
+	self._Objects[Part] = nil
 	if PartCFrame then
-		table.insert(MovingParts, Object)
+		table.insert(MovingParts, Part)
 		table.insert(MovingCFrames, PartCFrame)
 
 		if not ScheduledUpdate then
@@ -54,7 +74,7 @@ function Cache:GetPart(PartCFrame: CFrame?): BasePart
 		end
 	end
 
-	return Object
+	return Part
 end
 function Cache:ReturnPart(Part: BasePart)
 	if self._Objects[Part] then
@@ -94,21 +114,23 @@ function Cache:Destroy()
 	self.CacheHolder:Destroy()
 end
 
-local function GetCacheContainer(CachesContainer)
+local function GetCacheContainer()
 	local CacheHolder = Instance.new("Folder")
 	CacheHolder.Name = "ObjectCache"
-	CacheHolder.Parent = CachesContainer
 
 	return CacheHolder
 end
 
 local Constructor = {}
-function Constructor.new(Template: BasePart, CacheSize: number?, CachesContainer: Instance?)
+function Constructor.new(Template: BasePart | Model, CacheSize: number?, CachesContainer: Instance?)
 	local TemplateType = typeof(Template)
 	assert(TemplateType == "Instance", `Invalid argument #1 to 'ObjectCache.new' (BasePart expected, got {TemplateType})`)
 
-	assert(Template:IsA("BasePart"), `Invalid argument #1 to 'ObjectCache.new' (BasePart expected, got {Template.ClassName})`)
-	assert(Template.Archivable, `ObjectCache: Cannot use template part provided, as it has Archivable set to false.`)
+	assert(Template:IsA("BasePart") or Template:IsA("Model"), `Invalid argument #1 to 'ObjectCache.new' (BasePart or Model expected, got {Template.ClassName})`)
+	assert(Template.Archivable, `ObjectCache: Cannot use template object provided, as it has Archivable set to false.`)
+	if Template:IsA("Model") then
+		assert(Template.PrimaryPart ~= nil, `Invalid Template provided to 'ObjectCache.new': Model has no PrimaryPart set!`)
+	end
 
 	local CacheSizeType = typeof(CacheSize)
 	assert(CacheSize == nil or CacheSizeType == "number", `Invalid argument #2 to 'ObjectCache.new' (number expected, got {CacheSizeType})`)
@@ -118,33 +140,34 @@ function Constructor.new(Template: BasePart, CacheSize: number?, CachesContainer
 	assert(CachesContainer == nil or ContainerType == "Instance", `Invalid argument #3 to 'ObjectCache.new' (Instance expected, got {ContainerType})`)
 
 	local PreallocAmount = CacheSize or 10
-	local CacheParent = GetCacheContainer(CachesContainer or workspace)
+	local CacheParent = GetCacheContainer()
 
 	local Objects = table.create(PreallocAmount)
-	local FreeObjects = table.create(PreallocAmount)
+	local FreeObjects: {BasePart | Model} = table.create(PreallocAmount)
 
-	Template.Anchored = true
-	local TargetCFrame = FAR_AWAY_CFRAME
 	local TargetParts = table.create(PreallocAmount)
-	local TargetCFrames = table.create(PreallocAmount)
+
+	local IsTemplateModel = Template:IsA("Model")
 	for Index = 1, PreallocAmount do
 		local Object = Template:Clone()
+		local ObjectRoot: BasePart = if IsTemplateModel then (Object:: Model).PrimaryPart:: BasePart else Object:: BasePart
+
 		FreeObjects[Index] = Object
-		TargetParts[Index] = Object
-		TargetCFrames[Index] = TargetCFrame
+		TargetParts[Index] = ObjectRoot
+
+		ObjectRoot.CFrame = FAR_AWAY_CFRAME;
+		(Object:: Instance).Parent = CacheParent
 	end
 
-	workspace:BulkMoveTo(TargetParts, TargetCFrames, Enum.BulkMoveMode.FireCFrameChanged)
-	for Index = 1, PreallocAmount do
-		FreeObjects[Index].Parent = CacheParent
-	end
+	CacheParent.Parent = CachesContainer or workspace
 
 	return setmetatable({
 		CacheHolder = CacheParent,
 		_ExpandAmount = EXPAND_BY_AMOUNT,
 		_Template = Template,
-		_FreeObjects = FreeObjects,
+		_FreeObjects = TargetParts,
 		_Objects = Objects,
+		_IsTemplateModel = IsTemplateModel,
 		_PreallocatedAmount = PreallocAmount,
 	}, Cache)
 end
