@@ -73,6 +73,10 @@ function Cache:ReturnPart(Part: BasePart)
 	end
 end
 
+function Cache:Update()
+	task.spawn(UpdateMovementThread)
+end
+
 function Cache:ExpandCache(Amount: number)
 	assert(typeof(Amount) ~= "number" or Amount >= 0, `Invalid argument #1 to 'ObjectCache:ExpandCache' (positive number expected, got {typeof(Amount)})`)
 	self:_GetNew(Amount, false)
