@@ -43,7 +43,7 @@ function Cache:_GetNew(Amount: number, Warn: boolean)
 		local Object = Template:Clone()
 		local ObjectRoot: BasePart = if IsTemplateModel then (Object:: Model).PrimaryPart:: BasePart else Object:: BasePart
 
-		FreeObjectsContainer[Index] = Object
+		FreeObjectsContainer[Index] = ObjectRoot
 
 		local OffsetIndex = Index - InitialLength
 		TargetParts[OffsetIndex] = ObjectRoot
