@@ -1,5 +1,4 @@
 --!strict
---!optimize 2
 --!native
 local FAR_AWAY_CFRAME = CFrame.new(9e9, 0, 9e9)
 local EXPAND_BY_AMOUNT = 50
