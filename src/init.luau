@@ -165,7 +165,7 @@ function Constructor.new(Template: BasePart | Model, CacheSize: number?, CachesC
 		_ExpandAmount = EXPAND_BY_AMOUNT,
 		_Template = Template,
 		_FreeObjects = TargetParts,
-		_Objects = Objects,
+		_Objects = Objects:: {BasePart: boolean},
 		_IsTemplateModel = IsTemplateModel,
 		_PreallocatedAmount = PreallocAmount,
 	}, Cache)
