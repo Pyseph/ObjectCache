@@ -1,6 +1,6 @@
 {
-	"name": "ObjectCache",
-	"tree": {
-		"$path": "/src"
-	}
+    "name": "ObjectCache",
+    "tree": {
+        "$path": "src"
+    }
 }
