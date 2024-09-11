@@ -1,7 +1,7 @@
 {
   "name": "@rbxts/objectcache",
   "version": "1.0.0",
-  "main": "out/init.lua",
+  "main": "src/init.luau",
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
