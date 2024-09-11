@@ -1,17 +1,14 @@
-declare namespace ObjectCacheConstructor {
-  interface Constructor<T extends BasePart> {
-    new (): ObjectCache<T>;
-  }
-}
-
 interface ObjectCache<T extends BasePart> {
-  GetPart(partCFrame?: CFrame): T;
-  ReturnPart(part: T): void;
+	GetPart(partCFrame?: CFrame): T;
+	ReturnPart(part: T): void;
 
-  IsInUse(part: T): boolean;
+	IsInUse(part: T): boolean;
 
-  ExpandCache(amount: number): void;
-  SetExpandAmount(amount: number): void;
+	ExpandCache(amount: number): void;
+	SetExpandAmount(amount: number): void;
 
-  Update(): void;
+	Update(): void;
 }
+declare const ObjectCache: new <T extends BasePart>(template: T, cacheSize?: number, cachesContainer?: Folder) => ObjectCache<T>;
+export = ObjectCache;
+
