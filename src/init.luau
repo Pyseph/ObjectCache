@@ -56,7 +56,7 @@ function Cache:_GetNew(Amount: number, Warn: boolean)
 		(Object:: Instance).Parent = CacheHolder
 	end
 
-	return table.remove(self._FreeObjects)
+	return table.remove(FreeObjectsContainer)
 end
 
 function Cache:GetPart(PartCFrame: CFrame?): BasePart
