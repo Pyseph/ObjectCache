@@ -1,0 +1,27 @@
+{
+  "name": "@rbxts/objectcache",
+  "version": "1.0.0",
+  "main": "src/init.luau",
+  "scripts": {
+    "build": "rbxtsc",
+    "watch": "rbxtsc -w",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "types": "src/index.d.ts",
+  "files": [
+	  "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@rbxts/compiler-types": "^2.3.0-types.2",
+    "@rbxts/types": "^1.0.805",
+    "roblox-ts": "^2.3.0",
+    "typescript": "^5.6.2"
+  }
+}
