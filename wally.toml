@@ -1,6 +1,6 @@
 [package]
 name = "pyseph/objectcache"
-version = "1.4.5"
+version = "1.4.6"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 description = "A robust, blazing fast model and part cache for Roblox."

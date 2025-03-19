@@ -106,7 +106,7 @@ function Cache:SetExpandAmount(Amount: number)
 end
 
 function Cache:IsInUse(Object: BasePart): boolean
-	return self._Objects[Object] ~= nil
+	return self._Objects[Object] == nil
 end
 
 function Cache:Destroy()
@@ -141,7 +141,7 @@ function Constructor.new(Template: BasePart | Model, CacheSize: number?, CachesC
 	local PreallocAmount = CacheSize or 10
 	local CacheParent = GetCacheContainer()
 
-	local Objects = table.create(PreallocAmount)
+	local Objects: {[BasePart]: boolean} = {}
 	local FreeObjects: {BasePart | Model} = table.create(PreallocAmount)
 
 	local TargetParts = table.create(PreallocAmount)
@@ -165,7 +165,7 @@ function Constructor.new(Template: BasePart | Model, CacheSize: number?, CachesC
 		_ExpandAmount = EXPAND_BY_AMOUNT,
 		_Template = Template,
 		_FreeObjects = TargetParts,
-		_Objects = Objects:: {BasePart: boolean},
+		_Objects = Objects,
 		_IsTemplateModel = IsTemplateModel,
 		_PreallocatedAmount = PreallocAmount,
 	}, Cache)
